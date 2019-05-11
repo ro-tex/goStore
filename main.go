@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -24,7 +25,7 @@ func main() {
 	lambda.Start(Handler)
 }
 
-func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func Handler(ctx lambdacontext.LambdaContext, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
 	/* This is some test code for inspecting the request. */
 	jsonReq, err := json.Marshal(req)
@@ -35,6 +36,14 @@ func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse,
 		}, nil
 	}
 	fmt.Println("Request: " + string(jsonReq))
+	jsonCtx, err := json.Marshal(ctx)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 555,
+			Body:       err.Error(),
+		}, nil
+	}
+	fmt.Println("Context: " + string(jsonCtx))
 	//return events.APIGatewayProxyResponse{
 	//	StatusCode: 222,
 	//	Body:       string(jsonReq),
