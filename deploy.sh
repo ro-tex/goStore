@@ -2,6 +2,7 @@
 
 echo "> Compiling..."
 GOOS=linux go build -ldflags="-s -w" -o main
+
 echo "> Compressing..."
 zip package.zip main
 

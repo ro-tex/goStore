@@ -21,29 +21,37 @@ type item struct {
 	Value string `json:"Value"`
 }
 
+var middlewares = struct {
+	Request []func(req *events.APIGatewayProxyRequest)
+	Response []func(res *events.APIGatewayProxyResponse)
+	Error []func()
+}{}
+
 func main() {
+	middlewares.Request = append(middlewares.Request, cleanRequest)
 	lambda.Start(Handler)
 }
 
-func Handler(ctx lambdacontext.LambdaContext, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func cleanRequest(req *events.APIGatewayProxyRequest) {
+	pathLen := len(req.Path)
+
+	// strip trailing '/'
+	if req.Path[pathLen-1] == '/' && len(req.Path) > 1 {
+		req.Path = req.Path[:pathLen-1]
+	}
+}
+
+func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
 	/* This is some test code for inspecting the request. */
-	jsonReq, err := json.Marshal(req)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 555,
-			Body:       err.Error(),
-		}, nil
-	}
-	fmt.Println("Request: " + string(jsonReq))
-	jsonCtx, err := json.Marshal(ctx)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 555,
-			Body:       err.Error(),
-		}, nil
-	}
-	fmt.Println("Context: " + string(jsonCtx))
+	//jsonReq, err := json.Marshal(req)
+	//if err != nil {
+	//	return events.APIGatewayProxyResponse{
+	//		StatusCode: 555,
+	//		Body:       err.Error(),
+	//	}, nil
+	//}
+	//fmt.Println("Request: " + string(jsonReq))
 	//return events.APIGatewayProxyResponse{
 	//	StatusCode: 222,
 	//	Body:       string(jsonReq),
@@ -52,7 +60,13 @@ func Handler(ctx lambdacontext.LambdaContext, req events.APIGatewayProxyRequest)
 	/*
 		TODO:
 			* error class that can output nice JSON errors
+			* decent logging
 	*/
+
+	// Execute request middlewares
+	for _, m := range middlewares.Request {
+		m(&req)
+	}
 
 	switch req.HTTPMethod {
 	case "POST":
@@ -62,7 +76,7 @@ func Handler(ctx lambdacontext.LambdaContext, req events.APIGatewayProxyRequest)
 			if req.Path != "/v0/doc" {
 				return events.APIGatewayProxyResponse{
 					StatusCode: 405,
-					Body:       "Method not allowed (POST)",
+					Body:       "Method not allowed (POST) Path: " + req.Path,
 				}, nil
 			}
 
@@ -81,10 +95,17 @@ func Handler(ctx lambdacontext.LambdaContext, req events.APIGatewayProxyRequest)
 			if err != nil {
 				fmt.Println("> Error: " + err.Error())
 
-				return events.APIGatewayProxyResponse{
-					StatusCode: 500,
-					Body:       "Failed to create item. Error: " + string(err.Error()),
-				}, err
+				if err.Error() == "Item already exists!" {
+					return events.APIGatewayProxyResponse{
+						StatusCode: 400,
+						Body:       "Item already exists!",
+					}, err
+				} else {
+					return events.APIGatewayProxyResponse{
+						StatusCode: 500,
+						Body:       "Failed to create item. Error: " + string(err.Error()),
+					}, err
+				}
 			}
 			fmt.Println("> All good!")
 			return events.APIGatewayProxyResponse{
@@ -144,16 +165,15 @@ func Handler(ctx lambdacontext.LambdaContext, req events.APIGatewayProxyRequest)
 }
 
 func getDynamoClient() (*dynamodb.DynamoDB, error) {
-	fmt.Println("> Get dynamo client")
+	// TODO Cache this
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String("eu-west-1")},
 	)
 	if err != nil {
-		fmt.Println("> Err: " + err.Error())
+		fmt.Println("> Err while getting DynamoDB client: " + err.Error())
 		return nil, err
 	}
 
-	fmt.Println("> All good on Dynamo client!")
 	return dynamodb.New(sess), nil
 }
 
@@ -166,6 +186,13 @@ func createItem(it item) error {
 	itemFields, err := dynamodbattribute.MarshalMap(it)
 	if err != nil {
 		return err
+	}
+
+	// check for existence
+	// TODO this can be better - check the error, it should be a specific one
+	e, _ := getItem(it.Name)
+	if e.Name != "" {
+		return fmt.Errorf("Item already exists!")
 	}
 
 	input := &dynamodb.PutItemInput{
