@@ -7,7 +7,6 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -22,9 +21,9 @@ type item struct {
 }
 
 var middlewares = struct {
-	Request []func(req *events.APIGatewayProxyRequest)
+	Request  []func(req *events.APIGatewayProxyRequest)
 	Response []func(res *events.APIGatewayProxyResponse)
-	Error []func()
+	Error    []func()
 }{}
 
 func main() {
@@ -40,6 +39,8 @@ func cleanRequest(req *events.APIGatewayProxyRequest) {
 		req.Path = req.Path[:pathLen-1]
 	}
 }
+
+// TODO try https://github.com/appleboy/gin-lambda
 
 func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
