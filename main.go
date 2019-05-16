@@ -40,7 +40,7 @@ func cleanRequest(req *events.APIGatewayProxyRequest) {
 	}
 }
 
-// TODO try https://github.com/appleboy/gin-lambda
+// TODO try https://github.com/appleboy/gin-lambda or just gin
 
 func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
