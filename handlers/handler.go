@@ -7,15 +7,19 @@ import (
   "github.com/aws/aws-sdk-go/aws"
   "github.com/aws/aws-sdk-go/service/dynamodb"
   "github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-  "goStore/lib"
   "strings"
+
+  "goStore/lib"
+  "goStore/middlewares"
 )
 
 /*
-TODO
- - split the handlers in a more logical, non-monolithic way
+TODO:
+  This should be the main handler function that takes care of auth, executing middlewares, etc.
+  The actual handling of requests should be done in separate, per-endpoint handlers.
+  Those other handlers should return to this one, so it can execute response middlewares and also check for errors,
+  so it can run the error middlewares. Middlewares rule eveything! :D
 */
-
 func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
   /* This is some test code for inspecting the request. */
@@ -32,14 +36,8 @@ func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse,
   //	Body:       string(jsonReq),
   //}, nil
 
-  /*
-  	TODO:
-  		* error class that can output nice JSON errors
-  		* decent logging
-  */
-
-  // Execute request Middlewares
-  for _, m := range lib.Middlewares.Request {
+  // Execute request middlewares
+  for _, m := range middlewares.Request.GetAll() {
     m(&req)
   }
 

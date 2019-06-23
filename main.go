@@ -1,24 +1,24 @@
 package main
 
 import (
-  "github.com/aws/aws-lambda-go/events"
   "github.com/aws/aws-lambda-go/lambda"
+
   "goStore/handlers"
-  "goStore/lib"
+  "goStore/middlewares"
 )
 
-// TODO try https://github.com/appleboy/gin-lambda or just gin
+/*
+	TODO:
+    Ideas:
+    * try https://github.com/appleboy/gin-lambda or just gin
+    Features:
+    * auth0
+    * automated execution of middlewares?
+		* error class that can output nice JSON errors
+		* decent logging
+*/
 
 func main() {
-  lib.Middlewares.Request = append(lib.Middlewares.Request, cleanRequest)
+  middlewares.Request.Register(middlewares.CleanRequest)
   lambda.Start(handlers.Handler)
-}
-
-func cleanRequest(req *events.APIGatewayProxyRequest) {
-  pathLen := len(req.Path)
-
-  // strip trailing '/'
-  if req.Path[pathLen-1] == '/' && len(req.Path) > 1 {
-    req.Path = req.Path[:pathLen-1]
-  }
 }
