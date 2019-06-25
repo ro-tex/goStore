@@ -1,0 +1,12 @@
+image: "golang:1.12"
+
+before_script:
+  - which go
+
+build:
+  script:
+    - go build
+
+test:
+  script:
+    - go test
