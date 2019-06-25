@@ -17,7 +17,7 @@ TODO:
 func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
   // Execute request middlewares:
-  for _, m := range middlewares.Request.GetAll() {
+  for _, m := range middlewares.GlobalMWs.GetRequestMWs() {
     m(&req)
   }
 
@@ -27,13 +27,13 @@ func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse,
 
   // Execute error middlewares:
   if err != nil {
-    for _, m := range middlewares.Error.GetAll() {
-      m(&req) // TODO (&req, &err)?
+    for _, m := range middlewares.GlobalMWs.GetErrorMWs() {
+      m(&err)
     }
   }
 
   // Execute response middlewares:
-  for _, m := range middlewares.Response.GetAll() {
+  for _, m := range middlewares.GlobalMWs.GetResponseMWs() {
     m(&res)
   }
 

@@ -2,23 +2,44 @@ package middlewares
 
 import "github.com/aws/aws-lambda-go/events"
 
-type Middleware = func(req *events.APIGatewayProxyRequest)
+/*
+TODO
+  OK, obviously a global object is not the perfect approach. I need middlewares per handler and all that. For that the
+  handler needs to be a constructable object with a Handle() function exposed and that function should be passed to the
+  lambda.Start(). But until then this should do.
+*/
 
-type MiddlewareGroup struct {
-  middlewares []Middleware
+var GlobalMWs = Middlewares{}
+
+type Middlewares struct {
+  requestMWs  []func(req *events.APIGatewayProxyRequest)
+  responseMWs []func(req *events.APIGatewayProxyResponse)
+  errorMWs    []func(req *error)
 }
 
-func (mg *MiddlewareGroup) Register(fn Middleware) {
-  mg.middlewares = append(mg.middlewares, fn)
+func (mws *Middlewares) RegisterRequestMW(fn func(req *events.APIGatewayProxyRequest)) {
+  mws.requestMWs = append(mws.requestMWs, fn)
 }
 
-func (mg *MiddlewareGroup) GetAll() []Middleware {
-  return mg.middlewares
+func (mws *Middlewares) RegisterResponseMW(fn func(req *events.APIGatewayProxyResponse)) {
+  mws.responseMWs = append(mws.responseMWs, fn)
 }
 
-var Request MiddlewareGroup
-var Response MiddlewareGroup
-var Error MiddlewareGroup
+func (mws *Middlewares) RegisterErrorMW(fn func(req *error)) {
+  mws.errorMWs = append(mws.errorMWs, fn)
+}
+
+func (mws *Middlewares) GetRequestMWs() []func(req *events.APIGatewayProxyRequest) {
+  return mws.requestMWs
+}
+
+func (mws *Middlewares) GetResponseMWs() []func(req *events.APIGatewayProxyResponse) {
+  return mws.responseMWs
+}
+
+func (mws *Middlewares) GetErrorMWs() []func(req *error) {
+  return mws.errorMWs
+}
 
 // CleanRequest strips the trailing '/' if it exists
 func CleanRequest(req *events.APIGatewayProxyRequest) {
