@@ -7,8 +7,6 @@ import (
   "github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
-const TableName = "innoIvo"
-
 type Item struct {
   Name  string `json:"Name"`
   Value string `json:"Value"`

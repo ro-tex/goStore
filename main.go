@@ -11,6 +11,7 @@ import (
 	TODO:
     Ideas:
     * try https://github.com/appleboy/gin-lambda or just gin
+    * set up .gitlab-ci.yml
     Features:
     * auth0
     * automated execution of middlewares?
