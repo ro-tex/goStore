@@ -14,4 +14,6 @@ aws lambda update-function-code \
   --no-dry-run \
   --profile ro-tex
 
+rm main package.zip
+
 echo "> Done."

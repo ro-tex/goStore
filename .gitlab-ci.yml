@@ -1,12 +1,21 @@
 image: "golang:1.12"
 
-before_script:
-  - which go
+variables:
+  LAMBDA_NAME: 'goStore'
+  AWS_PROFILE: 'default'
 
-build:
-  script:
-    - go build
+#before_script:
+#  - which go
 
-test:
+# These are the default stages and we don't need to specify them:
+#stages:
+#  - build
+#  - test
+#  - deploy
+
+production:
+  stage: deploy
   script:
-    - go test
+    - 'GOOS=linux go build -ldflags="-s -w" -o main'
+    - zip package.zip main
+    - aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$PWD/package.zip --publish --no-dry-run --profile $AWS_PROFILE
