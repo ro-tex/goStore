@@ -1,10 +1,11 @@
 package handlers
 
 import (
-  "encoding/json"
-  "fmt"
-  "github.com/aws/aws-lambda-go/events"
-  "goStore/middlewares"
+	"encoding/json"
+	"fmt"
+	"goStore/middlewares"
+
+	"github.com/aws/aws-lambda-go/events"
 )
 
 /*
@@ -16,44 +17,44 @@ TODO:
 */
 func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-  // Execute request middlewares:
-  for _, m := range middlewares.GlobalMWs.GetRequestMWs() {
-    m(&req)
-  }
+	// Execute request middlewares:
+	for _, m := range middlewares.GlobalMWs.GetRequestMWs() {
+		m(&req)
+	}
 
-  // Delegate requests to different endpoints to different handlers:
-  // if path starts with v0/doc...
-  res, err := v0DocHandler(req)
+	// Delegate requests to different endpoints to different handlers:
+	// if path starts with v0/doc...
+	res, err := v0DocHandler(req)
 
-  // Execute error middlewares:
-  if err != nil {
-    for _, m := range middlewares.GlobalMWs.GetErrorMWs() {
-      m(&err)
-    }
-  }
+	// Execute error middlewares:
+	if err != nil {
+		for _, m := range middlewares.GlobalMWs.GetErrorMWs() {
+			m(&err)
+		}
+	}
 
-  // Execute response middlewares:
-  for _, m := range middlewares.GlobalMWs.GetResponseMWs() {
-    m(&res)
-  }
+	// Execute response middlewares:
+	for _, m := range middlewares.GlobalMWs.GetResponseMWs() {
+		m(&res)
+	}
 
-  return res, err
+	return res, err
 }
 
 func inspect(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-  jsonReq, err := json.Marshal(req)
-  if err != nil {
-    return events.APIGatewayProxyResponse{
-      StatusCode: 555,
-      Body:       err.Error(),
-    }, nil
-  }
+	jsonReq, err := json.Marshal(req)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 555,
+			Body:       err.Error(),
+		}, nil
+	}
 
-  fmt.Println("Request: " + string(jsonReq))
+	fmt.Println("Request: " + string(jsonReq))
 
-  return events.APIGatewayProxyResponse{
-    StatusCode: 222,
-    Body:       string(jsonReq),
-  }, nil
+	return events.APIGatewayProxyResponse{
+		StatusCode: 222,
+		Body:       string(jsonReq),
+	}, nil
 }
