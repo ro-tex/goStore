@@ -9,7 +9,7 @@ TODO
   lambda.Start(). But until then this should do.
 */
 
-var GlobalMWs = Middlewares{}
+var globalMWs = Middlewares{}
 
 type Middlewares struct {
 	requestMWs  []func(req *events.APIGatewayProxyRequest)
@@ -17,28 +17,28 @@ type Middlewares struct {
 	errorMWs    []func(req *error)
 }
 
-func (mws *Middlewares) RegisterRequestMW(fn func(req *events.APIGatewayProxyRequest)) {
-	mws.requestMWs = append(mws.requestMWs, fn)
+func RegisterRequestMW(fn func(req *events.APIGatewayProxyRequest)) {
+	globalMWs.requestMWs = append(globalMWs.requestMWs, fn)
 }
 
-func (mws *Middlewares) RegisterResponseMW(fn func(req *events.APIGatewayProxyResponse)) {
-	mws.responseMWs = append(mws.responseMWs, fn)
+func RegisterResponseMW(fn func(req *events.APIGatewayProxyResponse)) {
+	globalMWs.responseMWs = append(globalMWs.responseMWs, fn)
 }
 
-func (mws *Middlewares) RegisterErrorMW(fn func(req *error)) {
-	mws.errorMWs = append(mws.errorMWs, fn)
+func RegisterErrorMW(fn func(req *error)) {
+	globalMWs.errorMWs = append(globalMWs.errorMWs, fn)
 }
 
-func (mws *Middlewares) GetRequestMWs() []func(req *events.APIGatewayProxyRequest) {
-	return mws.requestMWs
+func GetRequestMWs() []func(req *events.APIGatewayProxyRequest) {
+	return globalMWs.requestMWs
 }
 
-func (mws *Middlewares) GetResponseMWs() []func(req *events.APIGatewayProxyResponse) {
-	return mws.responseMWs
+func GetResponseMWs() []func(req *events.APIGatewayProxyResponse) {
+	return globalMWs.responseMWs
 }
 
-func (mws *Middlewares) GetErrorMWs() []func(req *error) {
-	return mws.errorMWs
+func GetErrorMWs() []func(req *error) {
+	return globalMWs.errorMWs
 }
 
 // CleanRequest strips the trailing '/' if it exists

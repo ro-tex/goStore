@@ -34,8 +34,19 @@ func logResponse(res *events.APIGatewayProxyResponse) {
 	fmt.Println("[logResponse] Response: " + string(jsonReq))
 }
 
+func logError(e *error) {
+	jsonE, err := json.Marshal(e)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	fmt.Println("[logError] Response: " + string(jsonE))
+}
+
 func main() {
-	middlewares.GlobalMWs.RegisterRequestMW(middlewares.CleanRequest)
-	middlewares.GlobalMWs.RegisterResponseMW(logResponse)
+	middlewares.RegisterRequestMW(middlewares.CleanRequest)
+	middlewares.RegisterResponseMW(logResponse)
+	middlewares.RegisterErrorMW(logError)
 	lambda.Start(handlers.Handler)
 }
