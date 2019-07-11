@@ -1,3 +1,3 @@
 package config
 
-const TableName = "innoIvo"
+const TableName = "goStore"
