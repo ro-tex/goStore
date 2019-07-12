@@ -1,12 +1,15 @@
 image: "golang:1.12"
 
-#variables:
-#  LAMBDA_NAME: 'goStore'
-#  AWS_PROFILE: 'default'
+variables:
+  LAMBDA_NAME: 'goStore'
+  AWS_PROFILE: 'ro-tex'
+  AWS_REGION: 'eu-west-1'
 
-#before_script:
-#  - apk install zip
-#  - which go
+# TODO: mark this build with $CI_COMMIT_SHORT_SHA and make it log it?
+
+before_script:
+  - apk install zip
+  - which go
 
 # These are the default stages and we don't need to specify them:
 #stages:
@@ -24,4 +27,4 @@ development:
 #  script:
 #    - 'GOOS=linux go build -ldflags="-s -w" -o main'
 #    - zip package.zip main
-#    - aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$PWD/package.zip --publish --no-dry-run --profile $AWS_PROFILE
+    - aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$PWD/package.zip --publish --no-dry-run --profile $AWS_PROFILE --region $AWS_REGION

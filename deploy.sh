@@ -12,7 +12,8 @@ aws lambda update-function-code \
   --zip-file fileb://$PWD/package.zip \
   --publish \
   --no-dry-run \
-  --profile ro-tex
+  --profile ro-tex \
+  --region eu-west-1
 
 rm main package.zip
 
