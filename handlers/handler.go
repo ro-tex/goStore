@@ -9,11 +9,11 @@ import (
 )
 
 /*
-TODO:
+TODO: https://gitlab.com/ro-tex/gostore/issues/2
   This should be the main handler function that takes care of auth, executing middlewares, etc.
   The actual handling of requests should be done in separate, per-endpoint handlers.
   Those other handlers should return to this one, so it can execute response middlewares and also check for errors,
-  so it can run the error middlewares. Middlewares rule eveything! :D
+  so it can run the error middlewares. Middlewares rule everything! :D
 */
 func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 

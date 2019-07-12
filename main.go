@@ -14,13 +14,15 @@ import (
 /*
 	TODO:
     Ideas:
-    * try https://github.com/appleboy/gin-lambda or just gin
-    * set up .gitlab-ci.yml
+    	* try https://github.com/appleboy/gin-lambda or just gin
+    	* set up .gitlab-ci.yml -> https://gitlab.com/ro-tex/gostore/issues/1
+			* auto-deploy with time/sha-stamped version
     Features:
-    * auth0
-    * automated execution of middlewares?
-		* error class that can output nice JSON errors
-		* decent logging
+    	* auth0
+		* swagger
+		* automated execution of middlewares?
+			* error class that can output nice JSON errors
+			* decent logging
 */
 
 // just a test response middleware to see if it works correctly
