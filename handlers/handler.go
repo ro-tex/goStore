@@ -21,7 +21,7 @@ func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse,
 	ver := os.Getenv("VERSION")
 	sha := os.Getenv("SHA")
 	if len(ver) > 0 || len(sha) > 0 {
-		fmt.Printf("Version: %s, SHA: %s\n")
+		fmt.Printf("Version: %s, SHA: %s\n", ver, sha)
 	}
 
 	// Execute request middlewares:
