@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"goStore/middlewares"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 )
@@ -16,6 +17,12 @@ TODO: https://gitlab.com/ro-tex/gostore/issues/2
   so it can run the error middlewares. Middlewares rule everything! :D
 */
 func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+
+	ver := os.Getenv("VERSION")
+	sha := os.Getenv("SHA")
+	if len(ver) > 0 || len(sha) > 0 {
+		fmt.Printf("Version: %s, SHA: %s\n")
+	}
 
 	// Execute request middlewares:
 	for _, m := range middlewares.GetRequestMWs() {

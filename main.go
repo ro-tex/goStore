@@ -15,8 +15,6 @@ import (
 	TODO:
     Ideas:
     	* try https://github.com/appleboy/gin-lambda or just gin
-    	* set up .gitlab-ci.yml -> https://gitlab.com/ro-tex/gostore/issues/1
-			* auto-deploy with time/sha-stamped version
     Features:
     	* auth0
 		* swagger

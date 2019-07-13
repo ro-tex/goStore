@@ -5,8 +5,6 @@ variables:
   LAMBDA_NAME: goStore
   # AWS_DEFAULT_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY will be taken from the environment
 
-# TODO: mark this build with $CI_COMMIT_SHORT_SHA and make it log it?
-
 # The problem is that to be able to use go get, one needs to put
 # the repository in the $GOPATH. So for example if your gitlab domain
 # is gitlab.com, and that your repository is namespace/project, and
@@ -26,6 +24,7 @@ before_script:
   - apt-get update > /dev/null
   - apt-get -y install zip python-pip > /dev/null
   - pip install awscli > /dev/null
+  - export COMMIT_TIME=$(git show -s --format=%aI $CI_COMMIT_SHA)
 
 # These are the default stages and we don't need to specify them but mind the order.
 #stages:
@@ -42,4 +41,4 @@ build & deploy:
     - 'GOOS=linux go build -ldflags="-s -w" -o main'
     - zip package.zip main
     - aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$PWD/package.zip --publish --no-dry-run
-
+    - aws lambda update-function-configuration --function-name $LAMBDA_NAME --environment "{\"Variables\":{\"VERSION\":\"$COMMIT_TIME\",\"SHA\":\"$CI_COMMIT_SHA\"}}"
