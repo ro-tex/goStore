@@ -3,10 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"goStore/middlewares"
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
+
+	"goStore/middlewares"
 )
 
 /*

@@ -3,14 +3,15 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"goStore/config"
-	"goStore/lib"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+
+	"goStore/config"
+	"goStore/lib"
 )
 
 func v0DocHandler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
