@@ -20,7 +20,7 @@ before_script:
   - go version
   - python --version
   - export GO111MODULE=on
-  - go get -u
+  - go get
   - apt-get update > /dev/null
   - apt-get -y install zip python-pip > /dev/null
   - pip install awscli > /dev/null
