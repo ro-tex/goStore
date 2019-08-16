@@ -46,7 +46,9 @@ func logError(e *error) {
 
 func main() {
 	middlewares.RegisterRequestMW(middlewares.CleanRequest)
+	middlewares.RegisterResponseMW(middlewares.GnuTerryPratchett)
 	middlewares.RegisterResponseMW(logResponse)
 	middlewares.RegisterErrorMW(logError)
+
 	lambda.Start(handlers.Handler)
 }

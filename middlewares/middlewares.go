@@ -48,3 +48,11 @@ func CleanRequest(req *events.APIGatewayProxyRequest) {
 		req.Path = req.Path[:pathLen-1]
 	}
 }
+
+// http://www.gnuterrypratchett.com/
+func GnuTerryPratchett(res *events.APIGatewayProxyResponse) {
+	if res.Headers == nil {
+		res.Headers = make(map[string]string)
+	}
+	res.Headers["X-Clacks-Overhead"] = "GNU Terry Pratchett"
+}

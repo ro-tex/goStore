@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 
@@ -30,9 +31,18 @@ func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse,
 		m(&req)
 	}
 
+	var res events.APIGatewayProxyResponse
+	var err error
+
 	// Delegate requests to different endpoints to different handlers:
-	// if path starts with v0/doc...
-	res, err := v0DocHandler(req)
+	if strings.HasPrefix(req.Path, "/v0/doc") {
+		res, err = v0DocHandler(req)
+	} else {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+			Body:       "Endpoint not found: " + req.Path,
+		}, nil
+	}
 
 	// Execute error middlewares:
 	if err != nil {
