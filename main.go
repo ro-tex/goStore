@@ -6,6 +6,10 @@ import (
 	"reflect"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+
+	"goStore/handlers"
+	"goStore/middlewares"
 )
 
 /*
