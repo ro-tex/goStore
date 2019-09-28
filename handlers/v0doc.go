@@ -14,7 +14,7 @@ import (
 	"goStore/lib"
 )
 
-func v0DocHandler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func V0DocHandler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
 	switch req.HTTPMethod {
 	case "POST":

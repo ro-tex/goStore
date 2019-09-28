@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -11,6 +10,53 @@ import (
 	"goStore/middlewares"
 )
 
+// Handler is a function that can process a request
+type Handler func(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error)
+
+func NotFoundHandler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	return events.APIGatewayProxyResponse{
+		StatusCode: 404,
+		Body:       "Endpoint not supported: " + req.Path,
+	}, nil
+}
+
+// API defines the exposed endpoints and their handlers
+type API struct {
+	routes map[string]Handler
+}
+
+func (api *API) AddHandler(route string, handler Handler) {
+	if api.routes == nil {
+		api.routes = map[string]Handler{}
+	}
+	api.routes[route] = handler
+}
+
+func (api *API) GetHandler(path string) Handler {
+	if api.routes == nil {
+		api.routes = map[string]Handler{}
+	}
+
+	/*
+		TODO Well, this is obviously naive and terrible. But I wanted to get here on my own before involving frameworks.
+			Now that I'm here and it's obvious that I need an actual multiplexor, it's time to go and get gin into the mix.
+	*/
+	for route, handler := range api.routes {
+		if strings.HasPrefix(path, route) {
+			return handler
+		}
+	}
+
+	return NotFoundHandler
+}
+
+func (api *API) GetRoutes() map[string]Handler {
+	if api.routes == nil {
+		api.routes = map[string]Handler{}
+	}
+	return api.routes
+}
+
 /*
 TODO: https://gitlab.com/ro-tex/gostore/issues/2
   This should be the main handler function that takes care of auth, executing middlewares, etc.
@@ -18,7 +64,12 @@ TODO: https://gitlab.com/ro-tex/gostore/issues/2
   Those other handlers should return to this one, so it can execute response middlewares and also check for errors,
   so it can run the error middlewares. Middlewares rule everything! :D
 */
-func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+// MasterHandler takes care of all global, route-agnostic tasks, such as running middlewares, system checks,
+// initial logging, etc. It then selects the right handler for the request's path (or returns an error).
+// With that, its work is done and it delegates to the respective handler by returning it.
+//
+// MasterHandler does NOT care about authentication/authorisation, as those are route-dependent.
+func (api API) MasterHandler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
 	ver := os.Getenv("VERSION")
 	sha := os.Getenv("SHA")
@@ -35,14 +86,7 @@ func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse,
 	var err error
 
 	// Delegate requests to different endpoints to different handlers:
-	if strings.HasPrefix(req.Path, "/v0/doc") {
-		res, err = v0DocHandler(req)
-	} else {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
-			Body:       "Endpoint not found: " + req.Path,
-		}, nil
-	}
+	res, err = api.GetHandler(req.Path)(req)
 
 	// Execute error middlewares:
 	if err != nil {
@@ -57,22 +101,4 @@ func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse,
 	}
 
 	return res, err
-}
-
-func inspect(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
-	jsonReq, err := json.Marshal(req)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 555,
-			Body:       err.Error(),
-		}, nil
-	}
-
-	fmt.Println("Request: " + string(jsonReq))
-
-	return events.APIGatewayProxyResponse{
-		StatusCode: 222,
-		Body:       string(jsonReq),
-	}, nil
 }

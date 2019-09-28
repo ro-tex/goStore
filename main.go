@@ -88,5 +88,8 @@ func main() {
 	middlewares.RegisterResponseMW(logResponse)
 	middlewares.RegisterErrorMW(logError)
 
-	lambda.Start(handlers.Handler)
+	var api = new(handlers.API)
+	api.AddHandler("/v0/doc", handlers.V0DocHandler)
+
+	lambda.Start(api.MasterHandler)
 }
