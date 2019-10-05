@@ -12,18 +12,6 @@ import (
 	"goStore/middlewares"
 )
 
-/*
-	TODO:
-    Ideas:
-    	* try https://github.com/appleboy/gin-lambda or just gin
-    Features:
-    	* auth0
-		* swagger
-		* automated execution of middlewares?
-			* error class that can output nice JSON errors
-			* decent logging
-*/
-
 // just a test response middleware to see if it works correctly
 func logResponse(res *events.APIGatewayProxyResponse) {
 	jsonReq, err := json.Marshal(res)
@@ -81,7 +69,24 @@ func multiLog(event interface{}) {
 }
 
 func main() {
-	// TODO: check if API Gateway's error is errorstring or an actual *error
+	/*
+		TODO: check if API Gateway's error is errorstring or an actual *error
+
+		TODO: Switch to gin-gonic
+
+		TODO: Add a local execution method in order to test without deploying to AWS
+					https://djhworld.github.io/post/2018/01/27/running-go-aws-lambda-functions-locally/
+
+		TODO:
+			    Ideas:
+			    	* try https://github.com/appleboy/gin-lambda or just gin
+			    Features:
+			    	* auth0
+					* swagger
+					* automated execution of middlewares?
+						* error class that can output nice JSON errors
+						* decent logging
+	*/
 
 	middlewares.RegisterRequestMW(middlewares.CleanRequest)
 	middlewares.RegisterResponseMW(middlewares.GnuTerryPratchett)
