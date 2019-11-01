@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -15,6 +16,13 @@ import (
 )
 
 func V0DocHandler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+
+	if req.Headers["Authorization"] != os.Getenv("TOKEN") && req.Headers["authorization"] != os.Getenv("TOKEN") {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 401,
+			Body:       "Unauthorized",
+		}, nil
+	}
 
 	switch req.HTTPMethod {
 	case "POST":
