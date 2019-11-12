@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
+// Item represents a DynamoDB object that we intend to store or retrieve
 type Item struct {
 	Name  string `json:"Name"`
 	Value string `json:"Value"`

@@ -3,3 +3,4 @@ package.zip
 .idea/*
 /goStore
 /scratch.go
+*.env
