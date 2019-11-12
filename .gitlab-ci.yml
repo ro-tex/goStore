@@ -41,4 +41,4 @@ build & deploy:
     - 'GOOS=linux go build -ldflags="-s -w" -o main'
     - zip package.zip main
     - aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$PWD/package.zip --publish --no-dry-run
-    - aws lambda update-function-configuration --function-name $LAMBDA_NAME --environment "{\"Variables\":{\"VERSION\":\"$COMMIT_TIME\",\"SHA\":\"$CI_COMMIT_SHA\"}}"
+    - aws lambda update-function-configuration --function-name $LAMBDA_NAME --environment "{\"Variables\":{\"VERSION\":\"$COMMIT_TIME\",\"SHA\":\"$CI_COMMIT_SHA\",\"JWT_SECRET\":\"$JWT_SECRET\"}}"
