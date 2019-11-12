@@ -18,10 +18,7 @@ import (
 // }
 
 func getKey(_ *jwt.Token) (interface{}, error) {
-	s := os.Getenv("JWT_SECRET")
-	if s == "" {
-		s = "asdf" // TODO Smarter secret fallback -> .env or something
-	}
+	s, _ := os.LookupEnv("JWT_SECRET")
 	return []byte(s), nil
 }
 

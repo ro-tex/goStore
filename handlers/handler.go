@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"goStore/lib"
 	"os"
 	"strings"
 
@@ -57,6 +58,16 @@ func (api *API) GetRoutes() map[string]Handler {
 	return api.routes
 }
 
+func Auth(req *events.APIGatewayProxyRequest) bool {
+	if req.Headers["Authorization"] == "" {
+		return false
+	}
+
+	t := strings.Split(req.Headers["Authorization"], " ")[1]
+
+	return lib.ValidateJWT(t)
+}
+
 /*
 TODO: https://gitlab.com/ro-tex/gostore/issues/2
   This should be the main handler function that takes care of auth, executing middlewares, etc.
@@ -75,6 +86,13 @@ func (api API) MasterHandler(req events.APIGatewayProxyRequest) (events.APIGatew
 	sha := os.Getenv("SHA")
 	if len(ver) > 0 || len(sha) > 0 {
 		fmt.Printf("Version: %s, SHA: %s\n", ver, sha)
+	}
+
+	if !Auth(&req) {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 401,
+			Body:       "Unauthenticated",
+		}, nil
 	}
 
 	// Execute request middlewares:

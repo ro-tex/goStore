@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/joho/godotenv"
 
 	"goStore/handlers"
 	"goStore/middlewares"
@@ -87,6 +88,8 @@ func main() {
 						* error class that can output nice JSON errors
 						* decent logging
 	*/
+
+	godotenv.Load() // load .env variables
 
 	middlewares.RegisterRequestMW(middlewares.CleanRequest)
 	middlewares.RegisterResponseMW(middlewares.GnuTerryPratchett)
